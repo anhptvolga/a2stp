@@ -5,6 +5,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cmath>
 
 /*
  * Print all bit of byte c
@@ -51,6 +52,13 @@ bool testbit(char num, int i) {
     return (num & 1 << i) != 0;
 }
 
+/**
+ * check i-th bit of buffer buff has buff_size bytes
+ */
+bool arr_testbit(const char *buff, int i, int buff_size) {
+	return testbit(buff[buff_size - 1 - i / CHAR_SIZE], i % CHAR_SIZE);
+}
+
 /*
  * Turn on pos-th bit of buffer (buff), know size of buffer. 
  */
@@ -59,7 +67,7 @@ void arr_onbit(char *buff, int pos, int buff_size) {
 }
 
 /*
- * Store a number to buffer 
+ * Store a number to buffer (GT number)
  */
 char * int2buff(int i, int size) {
     char * buff = (char *)malloc(size);
@@ -75,6 +83,18 @@ char * int2buff(int i, int size) {
 			arr_onbit(buff, n - 1 - bits, size);
 
     return buff;
+}
+
+/*
+ * Load a buffer to receive a number (GT number) 
+ */
+int buff2int(const char *buff, int buff_size) {
+	int ret = 0;
+	int bits = buff_size * CHAR_SIZE;
+	for (int i = bits - 1; i >= 0; --i) {
+		ret += (1 << i) * arr_testbit(buff, i, buff_size);
+	}
+	return ret;
 }
 
 #endif
