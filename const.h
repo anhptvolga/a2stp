@@ -5,7 +5,6 @@
 #define SV_IP "192.168.2.54"
 #define SV_PORT 4321
 
-
 /* config filenames */
 #define CFILE_SCREENING "screening.conf"
 #define CFILE_GTT       "gtt.conf"
