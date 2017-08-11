@@ -6,6 +6,8 @@ struct signal_unit {
 	char pointCode[2];
 	char subNumber;
 	char gt[11];
+
+	char data[20];
 };
 
 #endif
