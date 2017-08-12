@@ -2,6 +2,7 @@
 #define __validator_h__
 
 #include <iostream>
+#include <string>
 #include <cstring>
 #include <fstream>
 #include "../su.h"
