@@ -2,8 +2,35 @@
 #define __server_h__
 
 #include <iostream>
+#include <unordered_map>
+#include <queue>
+#include <cstring>
+#include <stdlib.h>
+#include <unistd.h>
 
+#include <poll.h>
+#include <pthread.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include "validator.h"
 #include "screener.h"
+
+#define MAX_CLIENTS 1024
+#define QUEUE_LIMIT 5
+
+typedef std::pair<char*, time_t> raw_signal;
+
+void read_gtt_table();
+void read_block_table();
+
+void run();
+
+void* recv_signal(void* ptr);
+void* proc_signal(void* ptr);
+
+void buff_to_pa(char* raw, party_address & addr);
+void trans_data(raw_signal raw, signal_unit &signal);
 
 #endif
