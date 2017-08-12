@@ -1,4 +1,5 @@
 #include "bitlib.h"
+#include "su.h"
 
 /*
  * Print all bit of byte c
@@ -62,15 +63,16 @@ void arr_onbit(char *buff, int pos, int buff_size) {
 /*
  * Store a number to buffer (GT number)
  */
-char * int2buff(int i, int size) {
-    char * buff = (char *)malloc(size);
-	
+char * int2buff(int numb, int size) {
+    char *buff = new char[size];
+	memset(buff, 0, size);
+
 	int bits = size * CHAR_SIZE;
 	int n = bits;
     if(!buff) return NULL;
 
     // type punning because signed shift is implementation-defined
-    unsigned u = *(unsigned *)&i;
+    unsigned u = *(unsigned *)&numb;
     for(; bits--; u >>= 1)
         if (u & 1) 
 			arr_onbit(buff, n - 1 - bits, size);
@@ -89,4 +91,28 @@ int buff2int(const char *buff, int buff_size) {
 	}
 	return ret;
 }
+
+
+/*
+ * Load a buffer to receive a number (GT number) 
+ */
+void print_su(struct signal_unit s) {
+	cout << "SU: " << endl;
+	cout << "DI: ";
+	bin_print_char(s.CgPA.indicator);
+
+	int x = buff2int(s.CgPA.pointCode, 2);
+	cout << endl << "DPC: " << x;
+	cout << endl << "DSSN: " << (int)s.CgPA.subNumber;
+	ostringstream convert;
+	for (int i = 0; i < 11; i++) {
+		convert << (int)s.CgPA.gt[i];	
+	}
+	cout << endl << "DGT: " << convert.str() << endl;
+
+	x = buff2int(s.CdPA.pointCode, 2);
+	cout << "SPC: " << x << endl;
+	cout << "SSSN: " << (int)s.CdPA.subNumber << endl;
+}
+
 

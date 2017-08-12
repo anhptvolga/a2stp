@@ -6,6 +6,12 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+#include <string>
+#include <cstring>
+#include <iostream>
+#include <sstream>
+
+using namespace std;
 
 /*
  * Print all bit of byte c
@@ -45,11 +51,13 @@ void arr_onbit(char *buff, int pos, int buff_size);
 /*
  * Store a number to buffer (GT number)
  */
-char * int2buff(int i, int size);
+char * int2buff(int numb, int size);
 
 /*
  * Load a buffer to receive a number (GT number) 
  */
 int buff2int(const char *buff, int buff_size);
+
+void print_su(struct signal_unit su);
 
 #endif
