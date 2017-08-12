@@ -3,7 +3,7 @@
 
 /* server address */
 #define SV_IP "192.168.2.54"
-#define SV_PORT 4321
+#define SV_PORT 54321
 
 /* config filenames */
 #define CFILE_SCREENING "screening.conf"
