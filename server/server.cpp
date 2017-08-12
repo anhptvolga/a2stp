@@ -11,12 +11,14 @@ using namespace std;
 queue< pair<char*, time_t> > qsignals;
 pthread_mutex_t qsmutex = PTHREAD_MUTEX_INITIALIZER;
 gtt_table_type gtt_table;
+mapstrbool blockmap;
 
 int main(int argc, char* argv[]) {
     pthread_t recver, processer;
 
     // read config file
     read_gtt_table();
+    read_block_list(CFILE_SCREENING, blockmap);
 
     pthread_create(&recver, NULL, &recv_signal, NULL);
     pthread_create(&processer, NULL, &proc_signal, NULL);
@@ -142,7 +144,7 @@ void* proc_signal(void* ptr) {
             // process
             cout << "process: " << cur.first << endl;
             trans_data(cur, su);
-            if (!validate(su, cur.second)) {
+            if (check_block(su, cur.second, blockmap) && !validate(su, cur.second)) {
                 route_signal(su, cur.second);
             }
             free(cur.first);
