@@ -32,9 +32,10 @@ bool check_block(struct signal_unit su, time_t t, mapstrbool blist) {
 	// key to check s -> d
 	string key = h(su.CgPA.pointCode, su.CdPA.pointCode);
 	// key to check s -> *
-	string g_key = h(su.CgPA.pointCode, 0);
+	char null_buff[2] = {};
+	string g_key = h(su.CgPA.pointCode, null_buff);
 	// key to check * -> d
-	string d_key = h(0, su.CdPA.pointCode);
+	string d_key = h(null_buff, su.CdPA.pointCode);
 
 	iterstrbool i1 = blist.find(key);
 	iterstrbool i2 = blist.find(g_key);
