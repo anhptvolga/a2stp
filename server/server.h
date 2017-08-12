@@ -16,14 +16,16 @@
 #include <netinet/in.h>
 #include "validator.h"
 #include "screener.h"
+#include "router.h"
 
 #define MAX_CLIENTS 1024
 #define QUEUE_LIMIT 5
 
 typedef std::pair<char*, time_t> raw_signal;
+// typedef std::pair<int, int> pcssn;
+// typedef std::unordered_map<char*, pcssn> gtt_table_type;
 
 void read_gtt_table();
-void read_block_table();
 
 void run();
 

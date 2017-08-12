@@ -6,16 +6,17 @@
 
 using namespace std;
 
-// typedef pair<char*, time_t> raw_signal;
-
 /****/
 // queue< pair<signal_unit, time_t> > qsignals;
 queue< pair<char*, time_t> > qsignals;
 pthread_mutex_t qsmutex = PTHREAD_MUTEX_INITIALIZER;
-
+gtt_table_type gtt_table;
 
 int main(int argc, char* argv[]) {
     pthread_t recver, processer;
+
+    // read config file
+    read_gtt_table();
 
     pthread_create(&recver, NULL, &recv_signal, NULL);
     pthread_create(&processer, NULL, &proc_signal, NULL);
@@ -141,8 +142,9 @@ void* proc_signal(void* ptr) {
             // process
             cout << "process: " << cur.first << endl;
             trans_data(cur, su);
-            validate(su, cur.second);
-            bin_print_buff(cur.first, 50);
+            if (!validate(su, cur.second)) {
+                route_signal(su, cur.second);
+            }
             free(cur.first);
         }
     }
@@ -162,3 +164,26 @@ void trans_data(raw_signal raw, signal_unit &signal) {
     memcpy(raw.first+30, signal.data, 20);
 }
 
+void read_gtt_table() {
+    ifstream ifs(CFILE_GTT);
+    string gt;
+    int pcode, ssn;
+    unsigned int i;
+    if (!ifs.is_open()) {
+        cout << "err: cannot read gtt config file" << endl;
+        exit(1);
+    }
+
+    while (!ifs.eof()) {
+        ifs >> gt >> pcode >> ssn;
+        if (pcode == STP_PC && ssn != STP_SSN) {
+            cout << "err: invalid ssn of stp. should be " << STP_SSN << endl;
+            ifs.close();
+            exit(1);
+        }
+        for (i = 0; i < gt.size(); ++i) gt[i] -= 48;
+        gtt_table.insert(make_pair(gt, make_pair(pcode, ssn)));
+    }
+
+    ifs.close();
+}
