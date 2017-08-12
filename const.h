@@ -5,6 +5,10 @@
 #define SV_IP "192.168.2.54"
 #define SV_PORT 54321
 
+/* stp config */
+#define STP_PC 1000
+#define STP_SSN 6
+
 /* config filenames */
 #define CFILE_SCREENING "screening.conf"
 #define CFILE_GTT       "gtt.conf"
