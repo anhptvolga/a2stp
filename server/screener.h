@@ -1,9 +1,9 @@
 #ifndef __screener_h__
 #define __screener_h__
 
-#include "../su.h"
-#include "../bitlib.h"
-#include "../const.h"
+#include "utils/su.h"
+#include "bitlib/bitlib.h"
+#include "utils/const.h"
 #include <fstream>
 #include <iostream>
 #include <string>

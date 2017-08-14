@@ -5,9 +5,9 @@
 #include <string>
 #include <cstring>
 #include <fstream>
-#include "../su.h"
-#include "../const.h"
-#include "../bitlib.h"
+#include "utils/su.h"
+#include "utils/const.h"
+#include "bitlib/bitlib.h"
 
 /* list of error codes */
 #define ERR_SAME_PC 1
