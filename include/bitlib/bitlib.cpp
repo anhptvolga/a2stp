@@ -1,28 +1,36 @@
 #include "bitlib.h"
-#include "../utils/su.h"
 
-/*
+/**
  * Print all bit of byte c
  */
 void bin_print_char(char c) {
 	for (int i = 0; i < CHAR_SIZE; i++) {
 		if ((c & 0x80) != 0) {
-			printf("1");
+			cout << "1";
 		} else {
-			printf("0");
+			cout << "0";
 		}
 		c = c << 1;
-	}	
+	}
 }
 
-/*
+/**
  * Print all bits of buffer buff, know it size
  */
 void bin_print_buff(const char *buff, int size) {
 	for (int i = 0; i < size; i++) {
 		bin_print_char(buff[i]);
-		printf(" ");
+		cout << " ";
 	}
+}
+
+/**
+ * Print all bits of buffer buff, know it size
+ */
+void hex_print_buff(const char *buff, int size) {
+    for (int i = 0; i < size; i++) {
+        cout << hex << " 0x" << (int) buff[i];
+    }
 }
 
 /**
@@ -60,7 +68,7 @@ void arr_onbit(char *buff, int pos, int buff_size) {
 	onbit(buff[buff_size - 1 - pos / CHAR_SIZE], pos % CHAR_SIZE);
 }
 
-/*
+/**
  * Store a number to buffer (GT number)
  */
 char * int2buff(int numb, int size) {
@@ -80,7 +88,7 @@ char * int2buff(int numb, int size) {
     return buff;
 }
 
-/*
+/**
  * Load a buffer to receive a number (GT number) 
  */
 int buff2int(const char *buff, int buff_size) {
@@ -93,7 +101,7 @@ int buff2int(const char *buff, int buff_size) {
 }
 
 
-/*
+/**
  * Load a buffer to receive a number (GT number) 
  */
 void print_su(struct signal_unit s) {
@@ -114,5 +122,3 @@ void print_su(struct signal_unit s) {
 	cout << "SPC: " << x << endl;
 	cout << "SSSN: " << (int)s.CdPA.subNumber << endl;
 }
-
-

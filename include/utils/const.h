@@ -19,4 +19,8 @@
 #define LFILE_LOCAL     "local.log"
 #define LFILE_FORWARD   "forward.log"
 
+#define LFILE_PC_LIST "pc.list"
+#define LFILE_GT_LIST "gt.list"
+#define LFILE_SSN_LIST "ssn.list"
+
 #endif

@@ -10,6 +10,7 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
+#include "../utils/su.h"
 
 using namespace std;
 
@@ -41,7 +42,7 @@ void arr_onbit(char *buff, int pos, int buff_size);
 /**
  * Store a number to buffer (GT number)
  */
-char * int2buff(int numb, int size);
+char *int2buff(int numb, int size);
 
 /**
  * Load a buffer to receive a number (GT number) 
@@ -49,7 +50,7 @@ char * int2buff(int numb, int size);
 int buff2int(const char *buff, int buff_size);
 
 /**
- * Print signal unit as reaable format
+ * Print signal unit as readable format
  */
 void print_su(struct signal_unit su);
 
@@ -62,5 +63,10 @@ void bin_print_char(char c);
  * Print all bits of buffer buff, know it size
  */
 void bin_print_buff(const char *buff, int size);
+
+/**
+ * Print all bits of buffer buff, know it size
+ */
+void hex_print_buff(const char *buff, int size);
 
 #endif

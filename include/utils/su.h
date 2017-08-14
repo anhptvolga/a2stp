@@ -13,11 +13,13 @@
 #define MESSAGE_SIZE 20
 
 
+typedef unsigned char byte;
+
 // party address for calling and called
 // total size of pa = 15 bytes
 struct party_address {
-	char indicator;			
-	char pointCode[2];		
+	char indicator;
+	char pointCode[2];
 	char subNumber;
 	char gt[11];
 };
