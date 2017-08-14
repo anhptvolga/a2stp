@@ -1,26 +1,13 @@
-#include "../su.h"
-#include "../bitlib.h"
-#include "../const.h"
-#include <ctime>
-#include <cstdlib>
-#include <cstring>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>	
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <set>
-#include <errno.h>
+#include "client.h"
 
 using namespace std;
 
-// connect all party_address
+/*
+ * Concatenate all field of a party address as a array of octets
+ */
 char *pa_to_buffer(struct party_address p) {
 	char *ret = new char[PA_SIZE];
-	memset(ret, 0, PA_SIZE);	
-
+	memset(ret, 0, PA_SIZE);
 	memcpy(ret, &p.indicator, 1);
 	memcpy(ret + 1, p.pointCode, 2);
 	memcpy(ret + 3, &p.subNumber, 1);
@@ -28,7 +15,9 @@ char *pa_to_buffer(struct party_address p) {
 	return ret;
 }
 
-// function transform signal_unit to buffer -> transfer throught socket
+/*
+ * Concatenate all field of a signal unit as a array of octets
+ */
 char *su_to_buffer(struct signal_unit s) {
 	char *pk = new char[SU_SIZE];
 	memset(pk, 0, SU_SIZE);
@@ -40,22 +29,28 @@ char *su_to_buffer(struct signal_unit s) {
 	return pk;
 }
 
+
+/*
+ * Convert a global title (string) to array of octets
+ */
 char *strgtt_to_buff(string strgtt) {
 	char *buff = new char[strgtt.length()];
 	memset(buff, 0, strgtt.length());
 	memcpy(buff, strgtt.c_str(), strgtt.length());
 	for (int i = 0; i < strgtt.length(); ++i) {
 		buff[i] -= '0';
-	}	
+	}
 	return buff;
 }
 
-// Read gtt table, stored all value of point code, subsystemnumber and global title in array
+/*
+ * Read GTT table and collect all values of global title, pointcode and subsystem number.
+ */
 void read_gtt_table(set<string> &gtt_set, set<string> &pc_set, set<string> &ssn_set) {
 	string line;
 	string gt, pc, ssn;
 
-	ifstream f("gtt.conf", ios::in);
+	ifstream f(CFILE_GTT, ios::in);
 	if (f.is_open()) {
 		while (!f.eof()) {
 			f >> gt >> pc >> ssn;
@@ -123,7 +118,6 @@ struct signal_unit generate_su() {
 	return su;
 }
 
-
 void set_party_address(struct party_address &pa, string bitg, string gt, string pc, string ssn) {
 	pa.indicator = 11;
 	if (bitg == "1") {
@@ -146,7 +140,7 @@ struct signal_unit generate_dum_su(const char *filename) {
 		f >> sgt >> spc >> sssn;
 		f >> dgt >> dpc >> dssn;
 	} else {
-		cout << "unable to open file" << endl;	
+		cout << "Unable to open file" << endl;	
 	}
 	f.close();
 

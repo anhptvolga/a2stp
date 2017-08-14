@@ -1,5 +1,5 @@
 #include "bitlib.h"
-#include "su.h"
+#include "../utils/su.h"
 
 /*
  * Print all bit of byte c

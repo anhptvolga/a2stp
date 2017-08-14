@@ -1,9 +1,9 @@
 #ifndef __client_h__
 #define __client_h__
 
-#include "../su.h"
-#include "../bitlib.h"
-#include "../const.h"
+#include "utils/su.h"
+#include "bitlib/bitlib.h"
+#include "utils/const.h"
 #include <ctime>
 #include <cstdlib>
 #include <cstring>
@@ -27,7 +27,5 @@ void random_party_address(struct party_address &pa, set<string> gtt_set, set<str
 struct signal_unit generate_su();
 void set_party_address(struct party_address &pa, string bitg, string gt, string pc, string ssn);
 struct signal_unit generate_dum_su(const char *filename);
-
-
 
 #endif
