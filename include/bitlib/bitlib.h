@@ -67,6 +67,6 @@ void bin_print_buff(const char *buff, int size);
 /**
  * Print all bits of buffer buff, know it size
  */
-void hex_print_buff(const char *buff, int size);
+void hex_print_buff(ostream os, const char *buff, int size);
 
 #endif
