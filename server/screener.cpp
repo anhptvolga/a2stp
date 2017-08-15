@@ -1,8 +1,8 @@
 #include "screener.h"
 
-string h(char spc[2], char dpc[2]) {
-	int x = buff2int(spc, 2);
-	int y = buff2int(dpc, 2);
+string h(byte spc[2], byte dpc[2]) {
+	int x = buff2short(spc);
+	int y = buff2short(dpc);
 
 	ostringstream convert;
 	convert << x;
@@ -45,8 +45,8 @@ bool check_block(struct signal_unit su, time_t t, mapstrbool blist) {
 	if (i1 != blist.end()) {
 		ofstream f(LFILE_BLOCK);
 		if (f.is_open()) {
-			f << ctime(&t) 	<< " " << buff2int(su.CgPA.pointCode, 2) 
-							<< " " << buff2int(su.CgPA.pointCode, 2) 
+			f << ctime(&t) 	<< " " << buff2short(su.CgPA.pointCode) 
+							<< " " << buff2short(su.CgPA.pointCode) 
 							<< std::endl;
 		}
 		f.close();
