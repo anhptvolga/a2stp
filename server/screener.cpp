@@ -31,18 +31,27 @@ void read_block_list(const char *filename, mapstrbool &blist) {
 bool check_block(struct signal_unit su, time_t t, mapstrbool blist) {
 	// key to check s -> d
 	string key = h(su.CgPA.pointCode, su.CdPA.pointCode);
+	ostringstream sconvert;
+	sconvert << buff2short(su.CgPA.pointCode);
+	string spc = sconvert.str();
+
+	ostringstream dconvert;
+	dconvert << buff2short(su.CdPA.pointCode);
+	string dpc = dconvert.str();
+
+
 	// key to check s -> *
-	// string g_key = h(su.CgPA.pointCode, 0);
+	string g_key = spc + "*";
 	// key to check * -> d
-	// string d_key = h(0, su.CdPA.pointCode);
+	string d_key = "*" + dpc;
 
 	iterstrbool i1 = blist.find(key);
-	// iterstrbool i2 = blist.find(g_key);
-	// iterstrbool i3 = blist.find(d_key);
+	iterstrbool i2 = blist.find(g_key);
+	iterstrbool i3 = blist.find(d_key);
 	
-	//if (i1 == blist.end() && i2 == blist.end() && i3 == blist.end()) {
+	if (i1 == blist.end() && i2 == blist.end() && i3 == blist.end()) {
 	// found the key in map -> block it -> return false
-	if (i1 != blist.end()) {
+	//if (i1 != blist.end()) {
 		ofstream f(LFILE_BLOCK);
 		if (f.is_open()) {
 			f << ctime(&t) 	<< " " << buff2short(su.CgPA.pointCode) 
