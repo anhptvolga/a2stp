@@ -9,6 +9,7 @@
 #include <string>
 #include <cstring>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include "../utils/su.h"
 
@@ -40,14 +41,16 @@ bool arr_testbit(const char *buff, int i, int buff_size);
 void arr_onbit(char *buff, int pos, int buff_size);
 
 /**
- * Store a number to buffer (GT number)
+ * Convert a unsigned short number to char *
  */
-char *int2buff(int numb, int size);
+char *short2buff(unsigned short x);
+
 
 /**
- * Load a buffer to receive a number (GT number) 
+ * Convert a char * to unsigned short number
  */
-int buff2int(const char *buff, int buff_size);
+unsigned short buff2short(char * b);
+ 
 
 /**
  * Print signal unit as readable format
