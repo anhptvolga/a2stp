@@ -10,26 +10,29 @@ using namespace std;
 // queue< pair<signal_unit, time_t> > qsignals;
 queue< pair<char*, time_t> > qsignals;
 pthread_mutex_t qsmutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t qcond = PTHREAD_COND_INITIALIZER;
 gtt_table_type gtt_table;
 mapstrbool blockmap;
 
 int main(int argc, char* argv[]) {
-    pthread_t recver, processer;
+    pthread_t processer;
 
     // read config file
     read_gtt_table();
     read_block_list(CFILE_SCREENING, blockmap);
 
-    pthread_create(&recver, NULL, &recv_signal, NULL);
+    // pthread_create(&recver, NULL, &recv_signal, NULL);
     pthread_create(&processer, NULL, &proc_signal, NULL);
 
-    pthread_join(recver, NULL);
-    pthread_join(processer, NULL);
+    // pthread_join(recver, NULL);
+    // pthread_join(processer, NULL);
+
+    recv_signal(NULL);
 
     return 0;
 }
 
-void* recv_signal(void* ptr) {
+void recv_signal(void* ptr) {
     int socketid;           // server socket
     int socketcl;           // client socket
     int status;
@@ -41,13 +44,16 @@ void* recv_signal(void* ptr) {
     socklen_t claddrlen;
     // Poll
     pollfd clients[MAX_CLIENTS];
+    clock_t lastconn[MAX_CLIENTS];
     int maxi = 0, nready = 0;
     time_t curtime;
 
     std::cout << "starting server" << std::endl;
     // create
     socketid = socket(AF_INET, SOCK_STREAM, 0);
-    if (socketid < 0) cout << "dsfd" << endl;
+    if (socketid < 0) {
+        std::cout << "create socket fail" << std::endl;
+    }
     // bind
     socketaddr.sin_family = AF_INET;
     socketaddr.sin_port = htons(SV_PORT);
@@ -115,10 +121,14 @@ void* recv_signal(void* ptr) {
 
                     pthread_mutex_lock(&qsmutex);
                     qsignals.push(make_pair(data, curtime));
+                    cout << "recv ok. push to queue. size = " << qsignals.size() << endl;
                     pthread_mutex_unlock(&qsmutex);
-                    cout << "recv ok. push to queue" << endl;
-
-                    // free space in poll
+                    pthread_cond_signal(&qcond);
+                    // save time
+                    lastconn[i] = clock();
+                }
+                // free space in poll and close socket
+                if ((clock() - lastconn[i])/CLOCKS_PER_SEC > MAX_CONN_TIME) {
                     clients[i].fd = -1;
                     close(socketcl);
                 }
@@ -128,27 +138,28 @@ void* recv_signal(void* ptr) {
 
     }
     close(socketid);
-    return NULL;
+    // return NULL;
 }
 
 void* proc_signal(void* ptr) {
     raw_signal cur;
     signal_unit su;
     while (1) {
-        if (!qsignals.empty()) {
-            // get signal in queue
-            pthread_mutex_lock(&qsmutex);
-            cur = qsignals.front();
-            qsignals.pop();
-            pthread_mutex_unlock(&qsmutex);
-            // process
-            cout << "process: " << cur.first << endl;
-            trans_data(cur, su);
-            if (check_block(su, cur.second, blockmap) && !validate(su, cur.second)) {
-                route_signal(su, cur.second);
-            }
-            free(cur.first);
+        pthread_mutex_lock(&qsmutex);
+        if (qsignals.empty()) {
+            pthread_cond_wait(&qcond, &qsmutex);
         }
+        // get signal in queue
+        cur = qsignals.front();
+        qsignals.pop();
+        pthread_mutex_unlock(&qsmutex);
+        // process
+        cout << "process: " << cur.first << endl;
+        trans_data(cur, su);
+        if (check_block(su, cur.second, blockmap) && !validate(su, cur.second)) {
+            route_signal(su, cur.second);
+        }
+        free(cur.first);
     }
     return NULL;
 }
@@ -168,7 +179,8 @@ void trans_data(raw_signal raw, signal_unit &signal) {
 
 void read_gtt_table() {
     ifstream ifs(CFILE_GTT);
-    string gt;
+    string gt, tmp;
+    string::size_type sz;
     int pcode, ssn;
     unsigned int i;
     if (!ifs.is_open()) {
@@ -177,14 +189,25 @@ void read_gtt_table() {
     }
 
     while (!ifs.eof()) {
-        ifs >> gt >> pcode >> ssn;
-        if (pcode == STP_PC && ssn != STP_SSN) {
-            cout << "err: invalid ssn of stp. should be " << STP_SSN << endl;
-            ifs.close();
-            exit(1);
+        getline(ifs, tmp);
+        // std::cout << tmp << std::endl;
+        if (tmp[0] != '#' && tmp.size() != 0) {
+            gt = tmp.substr(0, 11);
+            // std::cout << tmp.size() << std::endl;
+            // std::cout << "|" << tmp.substr(12,4) << "|" << std::endl;
+            // std::cout << tmp.substr(14,1) << std::endl;
+
+            pcode = stoi(tmp.substr(12, 4), &sz);
+            ssn = stoi(tmp.substr(17, 1), &sz);
+            // ifs >> gt >> pcode >> ssn;
+            if (pcode == STP_PC && ssn != STP_SSN) {
+                cout << "err: invalid ssn of stp. should be " << STP_SSN << endl;
+                ifs.close();
+                exit(1);
+            }
+            for (i = 0; i < gt.size(); ++i) gt[i] -= 48;
+            gtt_table.insert(make_pair(gt, make_pair(pcode, ssn)));
         }
-        for (i = 0; i < gt.size(); ++i) gt[i] -= 48;
-        gtt_table.insert(make_pair(gt, make_pair(pcode, ssn)));
     }
 
     ifs.close();

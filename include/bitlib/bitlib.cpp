@@ -110,4 +110,3 @@ unsigned short buff2short(char *b) {
 	}
 	return x;
 }
- 
