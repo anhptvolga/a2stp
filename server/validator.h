@@ -13,6 +13,7 @@
 #define ERR_SAME_PC 1
 #define ERR_SAME_GT 2
 #define ERR_STP_SSN 3
+#define ERR_NO_GT 4
 
 /**
  * validate signal unit

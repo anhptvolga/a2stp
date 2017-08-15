@@ -6,6 +6,8 @@
 
 using namespace std;
 
+extern gtt_table_type gtt_table;
+
 void printpa(party_address pa) {
     cout << "indicator: "; bin_print_char(pa.indicator); cout << endl;
     cout << "PC: " << buff2int(pa.pointCode, 2); cout << " "; bin_print_buff(pa.pointCode, 2);
@@ -30,6 +32,10 @@ int validate(signal_unit su, time_t time) {
             write_vl_log(su, time, ERR_SAME_GT);
             return ERR_SAME_GT;
         }
+        if (gtt_table.find(string(called.gt)) == gtt_table.end()) {
+            write_vl_log(su, time, ERR_NO_GT);
+            return ERR_NO_GT;
+        }
     } else {
         // routing on SSN, check DPC and SSN
         if (!memcmp(calling.pointCode, called.pointCode, PC_SIZE)) {
@@ -49,8 +55,8 @@ int validate(signal_unit su, time_t time) {
 void write_vl_log(signal_unit su, time_t time, int errcode) {
     ofstream ofs(LFILE_DISCARD, std::ofstream::app);
     string gt(su.CgPA.gt, GT_SIZE);
-    ofs << ctime(&time) << ": "
-         << "pointcode = " << buff2int(su.CdPA.pointCode, PC_SIZE) << " : "
-         << errcode << endl;
+    ofs << ctime(&time);
+    // hex_print_buff(ofs, (u, SU_SIZE);
+    ofs << errcode << endl;
     ofs.close();
 }
