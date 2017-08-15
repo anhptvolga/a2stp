@@ -8,7 +8,7 @@ using namespace std;
 
 /****/
 // queue< pair<signal_unit, time_t> > qsignals;
-queue< pair<char*, time_t> > qsignals;
+queue< pair<byte*, time_t> > qsignals;
 pthread_mutex_t qsmutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t qcond = PTHREAD_COND_INITIALIZER;
 gtt_table_type gtt_table;
@@ -37,8 +37,8 @@ void recv_signal(void* ptr) {
     int socketcl;           // client socket
     int status;
     int count, i;
-    char buff[SU_SIZE];
-    char* data;
+    byte buff[SU_SIZE];
+    byte* data;
     sockaddr_in socketaddr;
     sockaddr claddr;        // client address
     socklen_t claddrlen;
@@ -117,7 +117,7 @@ void recv_signal(void* ptr) {
                 } else {
                     // push signal to queue
                     time(&curtime);
-                    data = (char*) malloc(SU_SIZE);
+                    data = (byte*) malloc(SU_SIZE);
                     memcpy(data, buff, SU_SIZE);
 
                     pthread_mutex_lock(&qsmutex);
@@ -155,7 +155,6 @@ void* proc_signal(void* ptr) {
         qsignals.pop();
         pthread_mutex_unlock(&qsmutex);
         // process
-        cout << "process: " << cur.first << endl;
         trans_data(cur, su);
         if (check_block(su, cur.second, blockmap) && !validate(su, cur.second)) {
             route_signal(su, cur.second);
@@ -165,7 +164,7 @@ void* proc_signal(void* ptr) {
     return NULL;
 }
 
-void buff_to_pa(char* raw, party_address &addr) {
+void buff_to_pa(byte* raw, party_address &addr) {
     addr.indicator = raw[0];
     memcpy(addr.pointCode, raw+1, 2);
     addr.subNumber = raw[3];
@@ -198,8 +197,7 @@ void read_gtt_table() {
             // std::cout << "|" << tmp.substr(12,4) << "|" << std::endl;
             // std::cout << tmp.substr(14,1) << std::endl;
 
-            pcode = stoi(tmp.substr(12, 4), &sz);
-            ssn = stoi(tmp.substr(17, 1), &sz);
+            sscanf(tmp.substr(12).c_str(), "%i %i", &pcode, &ssn);
             // ifs >> gt >> pcode >> ssn;
             if (pcode == STP_PC && ssn != STP_SSN) {
                 cout << "err: invalid ssn of stp. should be " << STP_SSN << endl;

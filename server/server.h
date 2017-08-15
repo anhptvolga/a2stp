@@ -24,7 +24,7 @@
 
 #define MAX_CONN_TIME 4     // in seconds
 
-typedef std::pair<char*, time_t> raw_signal;
+typedef std::pair<byte*, time_t> raw_signal;
 // typedef std::pair<int, int> pcssn;
 // typedef std::unordered_map<char*, pcssn> gtt_table_type;
 
@@ -35,7 +35,7 @@ void run();
 void recv_signal(void* ptr);
 void* proc_signal(void* ptr);
 
-void buff_to_pa(char* raw, party_address & addr);
+void buff_to_pa(byte* raw, party_address & addr);
 void trans_data(raw_signal raw, signal_unit &signal);
 
 #endif
