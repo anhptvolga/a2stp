@@ -1,16 +1,15 @@
 #ifndef __screener_h__
 #define __screener_h__
 
-#include "utils/su.h"
-#include "bitlib/bitlib.h"
-#include "utils/const.h"
+#include "../include/utils/su.h"
+#include "../include/bitlib/bitlib.h"
+#include "../include/utils/const.h"
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <cstring>
 #include <unordered_map>
 #include <ctime>
-
 
 typedef std::unordered_map<std::string, bool> mapstrbool;
 typedef std::unordered_map<std::string, bool>::iterator iterstrbool;

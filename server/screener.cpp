@@ -41,17 +41,16 @@ bool check_block(struct signal_unit su, time_t t, mapstrbool blist) {
 	// iterstrbool i3 = blist.find(d_key);
 	
 	//if (i1 == blist.end() && i2 == blist.end() && i3 == blist.end()) {
+	// found the key in map -> block it -> return false
 	if (i1 != blist.end()) {
 		ofstream f(LFILE_BLOCK);
-                cout << "ok" << endl;
 		if (f.is_open()) {
-                        cout << "sdf" << endl;
 			f << ctime(&t) 	<< " " << buff2int(su.CgPA.pointCode, 2) 
 							<< " " << buff2int(su.CgPA.pointCode, 2) 
 							<< std::endl;
 		}
 		f.close();
-                return false;
+		return false;
 	} 
-        return true;
+    return true;
 }
