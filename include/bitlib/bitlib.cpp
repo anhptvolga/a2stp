@@ -25,6 +25,13 @@ void bin_print_buff(const char *buff, int size) {
 /**
  * Print all bits of buffer buff, know it size
  */
+void hex_print_buff(ofstream os, const char *buff, int size) {
+	os << showbase << internal << setfill('0');
+    for (int i = 0; i < size; i++) {
+        os << hex << setw(4) << (unsigned int) buff[i] << " ";
+    }
+}
+
 void hex_print_buff(const char *buff, int size) {
 	cout << showbase << internal << setfill('0');
     for (int i = 0; i < size; i++) {
