@@ -12,13 +12,15 @@
 #define BIT_G_POS 6
 #define MESSAGE_SIZE 20
 
+typedef unsigned char byte;
+
 // party address for calling and called
 // total size of pa = 15 bytes
 struct party_address {
-	char indicator;					// 1 byte
-	unsigned short pointCode; 		// 2 bytes
-	unsigned char subNumber;		// 1 byte
-	char gt[11];					// 11 byte
+	byte indicator;					// 1 byte
+	byte pointCode[2]; 				// 2 bytes
+	byte subNumber;					// 1 byte
+	byte gt[11];					// 11 byte
 };
 
 // signal unit - a package of data from client to server
@@ -27,7 +29,7 @@ struct signal_unit {
 	struct party_address CgPA;
 	struct party_address CdPA;
 
-	char data[20];
+	byte data[20];
 };
 
 typedef std::pair<int, int> pcssn;
