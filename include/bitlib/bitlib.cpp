@@ -160,7 +160,7 @@ byte *su_to_buffer(struct signal_unit s) {
 	return buff;
 }
 
-string buffgtt_to_str(byte *gtt) {
+string buffgt_to_str(byte *gtt) {
     string res(11, 0);
     int i;
     for (i = 0; i < GT_SIZE; ++i) {
