@@ -117,3 +117,45 @@ unsigned short buff2short(byte *b) {
 	}
 	return x;
 }
+
+/**
+ * Concatenate all field of a party address as a array of octets
+ */
+ byte *pa_to_buffer(struct party_address p) {
+	byte *ret = new byte[PA_SIZE];
+	memset(ret, 0, PA_SIZE);	
+	memcpy(ret, &p.indicator, 1);
+	memcpy(ret + 1, p.pointCode, 2);
+	memcpy(ret + 3, &p.subNumber, 1);
+	memcpy(ret + 4, p.gt, 11);
+	return ret;
+}
+
+/**
+ * Concatenate all field of a signal unit as a array of octets
+ */
+byte *su_to_buffer(struct signal_unit s) {
+	byte *pk = new byte[SU_SIZE];
+	memset(pk, 0, SU_SIZE);			// set all bit to 0
+	// from struct to bits
+	const byte *cgpa_buf = pa_to_buffer(s.CgPA);
+	const byte *cdpa_buf = pa_to_buffer(s.CdPA);
+	// concat all to one 50 bytes buffer
+	memcpy(pk, cgpa_buf, PA_SIZE);
+	memcpy(pk + 15, cdpa_buf, PA_SIZE);	
+	memcpy(pk + 30, s.data, MESSAGE_SIZE);
+	return pk;
+}
+
+/*
+ * Convert a global title (string) to array of octets
+ */
+ byte *strgtt_to_buff(string strgtt) {
+	byte *buff = new byte[strgtt.length()];
+	memset(buff, 0, strgtt.length());
+	memcpy(buff, strgtt.c_str(), strgtt.length());
+	for (unsigned int i = 0; i < strgtt.length(); ++i) {
+		buff[i] -= '0';
+	}
+	return buff;
+}
