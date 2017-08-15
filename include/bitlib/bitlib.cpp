@@ -168,3 +168,27 @@ string buffgt_to_str(byte *gtt) {
     }
     return res;
 }
+
+void set_party_address(struct party_address &pa, string bitg, string gt, string pc, string ssn) {
+	pa.indicator = 11;
+	if (bitg == "1") {
+		onbit(pa.indicator, 6);
+	}
+	int x = atoi(pc.c_str());
+	memcpy(pa.pointCode, short2buff(x), 2);
+	int y = atoi(ssn.c_str());
+	pa.subNumber = y;
+	memcpy(pa.gt, strgtt_to_buff(gt), 11);
+}
+
+struct signal_unit new_su(string sbitg, string sgt, string spc, string sssn, string dgt, string dpc, string dssn) {
+	signal_unit su;
+	set_party_address(su.CgPA, sbitg, sgt, spc, sssn);
+	set_party_address(su.CdPA, "1", dgt, dpc, dssn);
+
+	char data_dump[20] = "this is dummy data!";
+
+	memcpy(su.data, data_dump, MESSAGE_SIZE);
+	return su;
+}
+

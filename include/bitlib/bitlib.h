@@ -75,4 +75,9 @@ byte *strgtt_to_buff(string strgtt);
 
 string buffgt_to_str(byte *gtt);
 
+
+// *** DUMMY
+struct signal_unit new_su(string sbitg, string sgt, string spc, string sssn, string dgt, string dpc, string dssn);
+void set_party_address(struct party_address &pa, string bitg, string gt, string pc, string ssn);
+
 #endif
