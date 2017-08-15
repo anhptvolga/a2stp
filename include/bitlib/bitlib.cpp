@@ -25,7 +25,7 @@ void bin_print_buff(const byte *buff, int size) {
 /**
  * Print all bits of buffer buff, know it size
  */
-void hex_print_buff(ofstream os, const byte *buff, int size) {
+void hex_print_buff(ofstream &os, const byte *buff, int size) {
 	os << showbase << internal << setfill('0');
     for (int i = 0; i < size; i++) {
         os << hex << setw(4) << (unsigned int) buff[i] << " ";
@@ -158,4 +158,13 @@ byte *su_to_buffer(struct signal_unit s) {
 		buff[i] -= '0';
 	}
 	return buff;
+}
+
+string buffgtt_to_str(byte *gtt) {
+    string res(11, 0);
+    int i;
+    for (i = 0; i < GT_SIZE; ++i) {
+        res[i] = gtt[i];
+    }
+    return res;
 }
