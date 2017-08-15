@@ -93,6 +93,8 @@ void recv_signal(void* ptr) {
             for (i = 1; i < MAX_CLIENTS; ++i)
                 if (clients[i].fd < 0) { 
                     clients[i].fd = socketcl;
+                    clients[i].events = POLLIN;
+                    lastconn[i] = clock();
                     cout << "add new client to poll" << endl;
                     break;
                 }
@@ -103,17 +105,16 @@ void recv_signal(void* ptr) {
             }
             clients[i].revents = POLLRDNORM;
             if (i > maxi) maxi = i;
-
-            // check all clients
-            for (i = 1; i < MAX_CLIENTS; ++i) {
-                if (clients[i].revents < 0) continue;
-                // ready for reading and no error
-                if (clients[i].revents != POLLIN) {
-                    count = recv(socketcl, (void*)buff, SU_SIZE, 0);
-                    if (count < 0) {
-                        cout << "recv err" << endl;
-                        // exit(1);
-                    }
+        }
+        // check all clients
+        for (i = 1; i < MAX_CLIENTS; ++i) {
+            if (clients[i].revents < 0) continue;
+            // ready for reading and no error
+            if (clients[i].revents == POLLIN && clients[i].revents != POLLERR) {
+                count = recv(socketcl, (void*)buff, SU_SIZE, 0);
+                if (count <= 0) {
+                    // exit(1);
+                } else {
                     // push signal to queue
                     time(&curtime);
                     data = (char*) malloc(SU_SIZE);
@@ -121,21 +122,21 @@ void recv_signal(void* ptr) {
 
                     pthread_mutex_lock(&qsmutex);
                     qsignals.push(make_pair(data, curtime));
-                    cout << "recv ok. push to queue. size = " << qsignals.size() << endl;
+                    cout << "recv: " << i << " " << count << "ok. push to queue. size = " << qsignals.size() << endl;
                     pthread_mutex_unlock(&qsmutex);
                     pthread_cond_signal(&qcond);
                     // save time
                     lastconn[i] = clock();
                 }
-                // free space in poll and close socket
-                if ((clock() - lastconn[i])/CLOCKS_PER_SEC > MAX_CONN_TIME) {
-                    clients[i].fd = -1;
-                    close(socketcl);
-                }
-                if (--nready <= 0) break;   // out if nomore ready client
             }
+            // free space in poll and close socket
+            if ((clock() - lastconn[i])/CLOCKS_PER_SEC > MAX_CONN_TIME) {
+                cout << "close connect " << i << endl;
+                clients[i].fd = -1;
+                close(socketcl);
+            }
+            if (--nready <= 0) break;   // out if nomore ready client
         }
-
     }
     close(socketid);
     // return NULL;
