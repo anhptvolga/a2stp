@@ -21,7 +21,7 @@ void read_block_list(const char *filename, mapstrbool &blist) {
 		while (getline(f, line)) {
 			size_t pos = line.find_first_of("#");
 			size_t l = line.length();
-			if (pos != -1) {
+			if (pos != string::npos) {
 				line = line.erase(pos, l - pos);
 			}
 
