@@ -44,11 +44,11 @@ int validate(signal_unit su, time_t time) {
             return ERR_SAME_PC;
         }
         // point code equals stp but ssn dif
-        if (STP_PC == buff2short(called.pointCode) &&
-                STP_SSN != called.subNumber) {
-            write_vl_log(su, time, ERR_STP_SSN);
-            return ERR_STP_SSN;
-        }
+        // if (STP_PC == buff2short(called.pointCode) &&
+        //         STP_SSN != called.subNumber) {
+        //     write_vl_log(su, time, ERR_STP_SSN);
+        //     return ERR_STP_SSN;
+        // }
     }
     return 0;
 }
@@ -59,9 +59,8 @@ void write_vl_log(signal_unit su, time_t time, int errcode) {
     gt = buffgt_to_str(su.CgPA.gt);
     string stime(ctime(&time));
     byte* buff = su_to_buffer(su);
-    ofs << stime.substr(0, stime.size()-1)
-        << "Error code = " << errcode
-        << "Signal: ";
+    ofs << stime.substr(0, stime.size()-1) << " "
+        << "Error code = " << errcode << " Signa: ";
     hex_print_buff(ofs, buff, SU_SIZE);
     ofs << endl;
     free(buff);
