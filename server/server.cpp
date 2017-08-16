@@ -125,6 +125,8 @@ void recv_signal(void* ptr) {
                     cout << "recv: " << i << " " << count << "ok. push to queue. size = " << qsignals.size() << endl;
                     pthread_mutex_unlock(&qsmutex);
                     pthread_cond_signal(&qcond);
+                    hex_print_buff(qsignals.front().first, SU_SIZE);
+                    cout << endl;
                     // save time
                     lastconn[i] = clock();
                 }
@@ -155,7 +157,12 @@ void* proc_signal(void* ptr) {
         qsignals.pop();
         pthread_mutex_unlock(&qsmutex);
         // process
+        cout << " process - ";
+        hex_print_buff(cur.first, SU_SIZE);
         trans_data(cur, su);
+        cout << endl;
+        hex_print_buff(su.data, 20);
+        cout << endl;
         if (check_block(su, cur.second, blockmap) && !validate(su, cur.second)) {
             route_signal(su, cur.second);
         }
@@ -174,7 +181,7 @@ void buff_to_pa(byte* raw, party_address &addr) {
 void trans_data(raw_signal raw, signal_unit &signal) {
     buff_to_pa(raw.first, signal.CgPA);
     buff_to_pa(raw.first+15, signal.CdPA);
-    memcpy(raw.first+30, signal.data, 20);
+    memcpy(signal.data, raw.first+30, 20);
 }
 
 void read_gtt_table() {
