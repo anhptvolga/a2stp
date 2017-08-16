@@ -8,20 +8,6 @@ using namespace std;
 
 extern gtt_table_type gtt_table;
 
-// void printpa(party_address pa) {
-//     cout << "indicator: "; bin_print_char(pa.indicator); cout << endl;
-//     cout << "PC: " << buff2int(pa.pointCode, 2); cout << " "; bin_print_buff(pa.pointCode, 2);
-//     cout << endl;
-//     cout << "ssn: " << (char)(pa.subNumber+48) << endl;
-//     cout << "gt: "; bin_print_buff(pa.gt, 11); cout << endl;
-// }
-// void printsingal(signal_unit su) {
-//     cout << "CgPA: " << endl;
-//     printpa(su.CgPA);
-//     cout << "CdPA: " << endl;
-//     printpa(su.CdPA);
-// }
-
 int validate(signal_unit su, time_t time) {
     party_address calling = su.CgPA;
     party_address called = su.CdPA;
@@ -43,12 +29,6 @@ int validate(signal_unit su, time_t time) {
             write_vl_log(su, time, ERR_SAME_PC);
             return ERR_SAME_PC;
         }
-        // point code equals stp but ssn dif
-        // if (STP_PC == buff2short(called.pointCode) &&
-        //         STP_SSN != called.subNumber) {
-        //     write_vl_log(su, time, ERR_STP_SSN);
-        //     return ERR_STP_SSN;
-        // }
     }
     return 0;
 }
@@ -59,8 +39,8 @@ void write_vl_log(signal_unit su, time_t time, int errcode) {
     gt = buffgt_to_str(su.CgPA.gt);
     string stime(ctime(&time));
     byte* buff = su_to_buffer(su);
-    ofs << stime.substr(0, stime.size()-1) << " "
-        << "Error code = " << errcode << " Signa: ";
+    ofs << stime.substr(0, stime.size()-1)
+        << " Error code = " << errcode << " Signal: ";
     hex_print_buff(ofs, buff, SU_SIZE);
     ofs << endl;
     free(buff);

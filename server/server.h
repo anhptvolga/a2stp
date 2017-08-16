@@ -28,14 +28,29 @@ typedef std::pair<byte*, time_t> raw_signal;
 // typedef std::pair<int, int> pcssn;
 // typedef std::unordered_map<char*, pcssn> gtt_table_type;
 
+/**
+ * read gtt table, config by user
+ */
 void read_gtt_table();
 
-void run();
+/**
+ * receiver message from client
+ */
+void recv_message(void* ptr);
 
-void recv_signal(void* ptr);
-void* proc_signal(void* ptr);
+/**
+ * handling message in queue
+ */
+void* proc_message(void* ptr);
 
+/**
+ * parsing party address from raw message
+ */
 void buff_to_pa(byte* raw, party_address & addr);
+
+/**
+ * parsing raw message to signal structure
+ */
 void trans_data(raw_signal raw, signal_unit &signal);
 
 #endif

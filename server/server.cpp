@@ -20,19 +20,15 @@ int main(int argc, char* argv[]) {
     // read config file
     read_gtt_table();
     read_block_list(CFILE_SCREENING, blockmap);
-
-    // pthread_create(&recver, NULL, &recv_signal, NULL);
-    pthread_create(&processer, NULL, &proc_signal, NULL);
-
-    // pthread_join(recver, NULL);
-    // pthread_join(processer, NULL);
-
-    recv_signal(NULL);
+    // create processing thread
+    pthread_create(&processer, NULL, &proc_message, NULL);
+    // start receiver
+    recv_message(NULL);
 
     return 0;
 }
 
-void recv_signal(void* ptr) {
+void recv_message(void* ptr) {
     int socketid;           // server socket
     int socketcl;           // client socket
     int status;
@@ -112,27 +108,26 @@ void recv_signal(void* ptr) {
             // ready for reading and no error
             if (clients[i].revents == POLLIN && clients[i].revents != POLLERR) {
                 count = recv(socketcl, (void*)buff, SU_SIZE, 0);
-                if (count <= 0) {
+                if (count != SU_SIZE) {
                     // exit(1);
                 } else {
                     // push signal to queue
                     time(&curtime);
                     data = (byte*) malloc(SU_SIZE);
                     memcpy(data, buff, SU_SIZE);
-
+                    // push message to queue
                     pthread_mutex_lock(&qsmutex);
                     qsignals.push(make_pair(data, curtime));
-                    cout << "recv: " << i << " " << count << "ok. push to queue. size = " << qsignals.size() << endl;
                     pthread_mutex_unlock(&qsmutex);
+                    // notice to processer
                     pthread_cond_signal(&qcond);
-                    hex_print_buff(qsignals.front().first, SU_SIZE);
-                    cout << endl;
-                    // save time
+                    cout << "recv: " << i << " " << count << "ok. push to queue. size = " << qsignals.size() << endl;
+                    // update timestamp
                     lastconn[i] = clock();
                 }
             }
             // free space in poll and close socket
-            if ((clock() - lastconn[i])/CLOCKS_PER_SEC > MAX_CONN_TIME) {
+            if (clients[i].fd > 0 && ((clock() - lastconn[i])/CLOCKS_PER_SEC > MAX_CONN_TIME)) {
                 cout << "close connect " << i << endl;
                 clients[i].fd = -1;
                 close(socketcl);
@@ -141,14 +136,14 @@ void recv_signal(void* ptr) {
         }
     }
     close(socketid);
-    // return NULL;
 }
 
-void* proc_signal(void* ptr) {
+void* proc_message(void* ptr) {
     raw_signal cur;
     signal_unit su;
     while (1) {
         pthread_mutex_lock(&qsmutex);
+        // waiting when queue empty
         if (qsignals.empty()) {
             pthread_cond_wait(&qcond, &qsmutex);
         }
@@ -156,16 +151,12 @@ void* proc_signal(void* ptr) {
         cur = qsignals.front();
         qsignals.pop();
         pthread_mutex_unlock(&qsmutex);
-        // process
-        cout << " process - ";
-        hex_print_buff(cur.first, SU_SIZE);
+        // handling message
         trans_data(cur, su);
-        cout << endl;
-        hex_print_buff(su.data, 20);
-        cout << endl;
         if (check_block(su, cur.second, blockmap) && !validate(su, cur.second)) {
             route_signal(su, cur.second);
         }
+        // free memory
         free(cur.first);
     }
     return NULL;
@@ -187,25 +178,20 @@ void trans_data(raw_signal raw, signal_unit &signal) {
 void read_gtt_table() {
     ifstream ifs(CFILE_GTT);
     string gt, tmp;
-    string::size_type sz;
     int pcode, ssn;
     unsigned int i;
+    // check file open
     if (!ifs.is_open()) {
         cout << "err: cannot read gtt config file" << endl;
         exit(1);
     }
-
+    // read all line in gtt config file
     while (!ifs.eof()) {
         getline(ifs, tmp);
-        // std::cout << tmp << std::endl;
+        // check comment line
         if (tmp[0] != '#' && tmp.size() != 0) {
             gt = tmp.substr(0, 11);
-            // std::cout << tmp.size() << std::endl;
-            // std::cout << "|" << tmp.substr(12,4) << "|" << std::endl;
-            // std::cout << tmp.substr(14,1) << std::endl;
-
             sscanf(tmp.substr(12).c_str(), "%i %i", &pcode, &ssn);
-            // ifs >> gt >> pcode >> ssn;
             if (pcode == STP_PC && ssn != STP_SSN) {
                 cout << "err: invalid ssn of stp. should be " << STP_SSN << endl;
                 ifs.close();
@@ -215,6 +201,6 @@ void read_gtt_table() {
             gtt_table.insert(make_pair(gt, make_pair(pcode, ssn)));
         }
     }
-
+    // closing file
     ifs.close();
 }

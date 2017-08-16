@@ -10,10 +10,10 @@
 #include "../include/bitlib/bitlib.h"
 
 /* list of error codes */
-#define ERR_SAME_PC 1
-#define ERR_SAME_GT 2
-#define ERR_STP_SSN 3
-#define ERR_NO_GT 4
+#define ERR_SAME_PC 1   // SPC == DPC
+#define ERR_SAME_GT 2   // SGT == DGT
+#define ERR_STP_SSN 3   // invalid subsystem number of STP
+#define ERR_NO_GT 4     // GTT not exist
 
 /**
  * validate signal unit
