@@ -4,7 +4,7 @@ using namespace std;
 
 extern gtt_table_type gtt_table;
 
-void route_signal(signal_unit signal, time_t time) {
+void route_message(signal_unit signal, time_t time) {
     std::ofstream ofs;
     const char* filename;
     std::string gt = buffgt_to_str(signal.CgPA.gt);

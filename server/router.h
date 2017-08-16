@@ -11,6 +11,9 @@
 #include "utils/const.h"
 #include "validator.h"
 
-void route_signal(signal_unit signal, time_t time);
+/**
+ * route message
+ */
+void route_message(signal_unit signal, time_t time);
 
 #endif

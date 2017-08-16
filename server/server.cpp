@@ -154,7 +154,7 @@ void* proc_message(void* ptr) {
         // handling message
         trans_data(cur, su);
         if (check_block(su, cur.second, blockmap) && !validate(su, cur.second)) {
-            route_signal(su, cur.second);
+            route_message(su, cur.second);
         }
         // free memory
         free(cur.first);
