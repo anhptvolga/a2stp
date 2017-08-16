@@ -113,35 +113,30 @@ struct signal_unit generate_su(set<string> gt_set, set<string> pc_set, set<strin
 	return su;
 }
 
-#ifndef UNIT_TEST
-// main loop. client will send data to server every 3s.
+#ifndef UNIT_TEST // to compile without main function
+
+/**
+ * For every 100ms, pack and send a signal to server.
+ */
 int main(int argc, char const *argv[]) {
-    // test
+    // Read config file
+    cout << "Reading config file..." << endl;
+    set<string> lgt, lpc, lssn;
+    read_gt_list(LFILE_GT_LIST, lgt);
+    read_pc_list(LFILE_PC_LIST, lpc);
+    read_ssn_list(LFILE_SSN_LIST, lssn);
 
-    // cout << "Reading config file..." << endl;
-    // set<string> lgt, lpc, lssn;
-    // read_gt_list(LFILE_GT_LIST, lgt);
-    // read_pc_list(LFILE_PC_LIST, lpc);
-    // read_ssn_list(LFILE_SSN_LIST, lssn);
+    if (!lgt.size() || !lpc.size() || !lssn.size()) {
+        cout << "No invalid data in config file... Error" << endl;
+        exit(1);
+    }
 
-    // struct signal_unit su = generate_su(lgt, lpc, lssn);
-    // //struct signal_unit su = generate_dum_su("dump/m1.txt");
-    // byte *message = su_to_buffer(su);
+    cout << "Done! Prepare to connect..." << endl;  
 
-    // // print some notification
-    // cout << "Message: " << endl;
-    // hex_print_buff(message, SU_SIZE);
-    // cout << endl;
-
-    // cout << "Original: " << endl;
-    // print_su(su);
-    // cout << endl;
-
-
-    // main program 
+    // prepare for random 
     srand(time(NULL));
     
-    // Connect to socket
+    // Define a socket
     int sock;
     struct sockaddr_in server;
 
@@ -153,7 +148,7 @@ int main(int argc, char const *argv[]) {
     }
     cout << "Socket created" << endl;
 
-    // Config
+    // Config socket
     server.sin_addr.s_addr = inet_addr(SV_IP);
     server.sin_family = AF_INET;
     server.sin_port = htons(SV_PORT);
@@ -163,33 +158,19 @@ int main(int argc, char const *argv[]) {
         cout << "Connect failed. Error " << strerror(errno) << endl;
         exit(1);
     }
-
     cout << "Connected" << endl;
 
-    cout << "Reading config file..." << endl;
-    set<string> lgt, lpc, lssn;
-    read_gt_list(LFILE_GT_LIST, lgt);
-    read_pc_list(LFILE_PC_LIST, lpc);
-    read_ssn_list(LFILE_SSN_LIST, lssn);
-
-    if (!lgt.size() || !lpc.size() || !lssn.size()) {
-        cout << "No invalid data in config file... Error" << endl;
-        close(sock);
-        exit(1);
-    }
-
-    while (true) {
+    // loop forever
+    while (1) {
+        // message
         const byte *message = new byte[SU_SIZE];
         // generate data
         struct signal_unit su = generate_su(lgt, lpc, lssn);
-        //struct signal_unit su = generate_dum_su("dump/m1.txt");
-        message = su_to_buffer(su);
-
+        message = su_to_buffer(su);        
         // print some notification
         cout << "Message: " << endl;
         hex_print_buff(message, SU_SIZE);
-        cout << endl;
-
+        cout << endl;        
         // send data to server
         ssize_t sent = send(sock, message, SU_SIZE, 0);
         if (sent < 0) {

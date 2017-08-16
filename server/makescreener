@@ -1,0 +1,3 @@
+g++ -std=c++11 -c ../include/bitlib/bitlib.cpp -o bitlib.o
+
+g++ -std=c++11 -o screener screener.cpp bitlib.o
