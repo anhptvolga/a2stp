@@ -2,7 +2,8 @@
 #define __const_h__
 
 /* server address */
-#define SV_IP "192.168.2.54"
+// #define SV_IP "192.168.2.126"
+#define SV_IP "127.0.0.1"
 #define SV_PORT 54321
 
 /* stp config */

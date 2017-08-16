@@ -47,13 +47,6 @@ void onbit(byte &num, int i) {
 }
 
 /**
- * turn off i-th bit of num
- */
-void offbit(byte &num, int i) {
-    num &= ~(1 << i);
-}
-
-/**
  * check i-th bit of num
  */
 bool testbit(byte num, int i) {
@@ -191,4 +184,3 @@ struct signal_unit new_su(string sbitg, string sgt, string spc, string sssn, str
 	memcpy(su.data, data_dump, MESSAGE_SIZE);
 	return su;
 }
-

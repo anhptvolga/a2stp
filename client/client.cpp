@@ -113,6 +113,7 @@ struct signal_unit generate_su(set<string> gt_set, set<string> pc_set, set<strin
 	return su;
 }
 
+#ifndef UNIT_TEST
 // main loop. client will send data to server every 3s.
 int main(int argc, char const *argv[]) {
     // test
@@ -205,3 +206,5 @@ int main(int argc, char const *argv[]) {
     close(sock); // close socket
     return 0;
 }
+
+#endif

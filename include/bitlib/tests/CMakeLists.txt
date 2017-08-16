@@ -1,2 +1,0 @@
-add_executable(test_basic_example basic_test_example.cpp)
-target_link_libraries(test_basic_example PRIVATE boost_test bitlib utils)

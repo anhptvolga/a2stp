@@ -72,7 +72,6 @@ void hex_print_buff(ofstream &os, const byte *buff, int size);
 byte *pa_to_buffer(struct party_address p);
 byte *su_to_buffer(struct signal_unit s);
 byte *strgtt_to_buff(string strgtt);
-
 string buffgt_to_str(byte *gtt);
 
 

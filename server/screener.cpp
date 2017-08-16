@@ -88,8 +88,6 @@ bool check_block(struct signal_unit su, time_t t, mapstrbool blist) {
 // 	mapstrbool hmap;
 // 	read_block_list(CFILE_SCREENING, hmap);
 // 	check_block(s1, time(0), hmap);
-	
-
 // 	//print_su(s1);
 // 	return 0;
 // }
