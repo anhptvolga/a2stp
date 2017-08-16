@@ -85,7 +85,7 @@ void random_party_address(struct party_address &pa, set<string> gtt_set, set<str
 	pa.indicator = 11;
 	// random bit G
 	if ((rand() % 10 + 1) % 2) {
-		onbit(pa.indicator, 6);
+		onbit(pa.indicator, BIT_G_POS);
 	}
 	// iterator for random pos
 	set<string>::iterator it;
@@ -164,28 +164,7 @@ void loop_send() {
     cout << "Read done!" << endl;  
     
     // Define a socket
-    int sock;
-    struct sockaddr_in server;
-
-    // Create socket
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) {
-        cout << "Could not create socket" << endl;
-        exit(1);
-    }
-    cout << "Socket created" << endl;
-
-    // Config socket
-    server.sin_addr.s_addr = inet_addr(SV_IP);
-    server.sin_family = AF_INET;
-    server.sin_port = htons(SV_PORT);
-
-    // Connect to server
-    if (connect(sock, (struct sockaddr*)&server, sizeof(server)) == -1) {
-        cout << "Connect failed. Error " << strerror(errno) << endl;
-        exit(1);
-    }
-    cout << "Connected" << endl;
+    int sock = connect_sock();
 
     // loop forever
     while (1) {

@@ -9,6 +9,8 @@
 #define PA_SIZE 15
 #define GT_SIZE 11
 #define PC_SIZE 2
+#define SSN_SIZE 1
+#define BYTE_SIZE 8
 #define BIT_G_POS 6
 #define MESSAGE_SIZE 20
 

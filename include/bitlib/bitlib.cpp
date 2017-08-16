@@ -28,14 +28,18 @@ void bin_print_buff(const byte *buff, int size) {
 void hex_print_buff(ofstream &os, const byte *buff, int size) {
 	os << showbase << internal << setfill('0');
     for (int i = 0; i < size; i++) {
-        os << hex << setw(4) << (unsigned int) buff[i] << " ";
+		os << hex << (unsigned int) buff[i] << " ";
+		cout << dec;
     }
 }
 
+/**
+ * Print all bits of buffer buff, know it size
+ */
 void hex_print_buff(const byte *buff, int size) {
 	cout << showbase << internal << setfill('0');
     for (int i = 0; i < size; i++) {
-        cout << hex << setw(4) << (unsigned int) buff[i] << " ";
+        cout << hex << (unsigned int) buff[i] << " ";
     }
 }
 
@@ -56,17 +60,16 @@ bool testbit(byte num, int i) {
 /**
  * check i-th bit of buffer buff has buff_size bytes
  */
-bool arr_testbit(const byte *buff, int i, int buff_size) {
+bool arr_testbit(const byte *buff, int i) {
 	return testbit(buff[i / CHAR_SIZE], i % CHAR_SIZE);
 }
 
 /*
  * Turn on pos-th bit of buffer (buff), know size of buffer. 
  */
-void arr_onbit(byte *buff, int pos, int buff_size) {
+void arr_onbit(byte *buff, int pos) {
 	onbit(buff[pos / CHAR_SIZE], pos % CHAR_SIZE);
 }
-
 
 /**
  * Load a buffer to receive a number (GT number) 
@@ -74,7 +77,7 @@ void arr_onbit(byte *buff, int pos, int buff_size) {
 void print_su(struct signal_unit s) {
 	cout << "DI: ";
 	bin_print_char(s.CgPA.indicator);
-
+	// print some informations
 	cout << endl << "DPC: " << dec << buff2short(s.CgPA.pointCode);
 	cout << endl << "DSSN: " << (int)s.CgPA.subNumber;
 	ostringstream convert;
@@ -82,17 +85,20 @@ void print_su(struct signal_unit s) {
 		convert << (int)s.CgPA.gt[i];	
 	}
 	cout << endl << "DGT: " << convert.str() << endl;
-
+	// print spc, sssn
 	cout << "SPC: " << buff2short(s.CdPA.pointCode) << endl;
 	cout << "SSSN: " << (int)s.CdPA.subNumber << endl;
 }
 
+/**
+ * return bytes from unsigned short
+ */
 byte *short2buff(unsigned short x) {
 	byte *b = new byte[2];
 	memset(b, 0, 2);
 	for (int i = 0; i < 16; ++i) {
 		if ((x & 1 << i) != 0) {
-			arr_onbit(b, i, 2);
+			arr_onbit(b, i);
 		} 
 	}
 
@@ -100,12 +106,12 @@ byte *short2buff(unsigned short x) {
 }
 
 /**
- * Convert a char * to unsigned short number
+ * Convert array of bytes to unsigned short number
  */
 unsigned short buff2short(byte *b) {
 	unsigned short x = 0;
 	for (int i = 0; i < 16; ++i) {
-		if (arr_testbit(b, i, 2))
+		if (arr_testbit(b, i))
 			x += (1 << i);
 	}
 	return x;
@@ -153,6 +159,9 @@ byte *su_to_buffer(struct signal_unit s) {
 	return buff;
 }
 
+/**
+ * Convert array of bytes to string (apply to global title).
+ */
 string buffgt_to_str(byte *gtt) {
     string res(11, 0);
     int i;
@@ -162,6 +171,9 @@ string buffgt_to_str(byte *gtt) {
     return res;
 }
 
+/**
+ * Set party address by give it all fields.
+ */
 void set_party_address(struct party_address &pa, string bitg, string gt, string pc, string ssn) {
 	pa.indicator = 11;
 	if (bitg == "1") {
@@ -174,13 +186,19 @@ void set_party_address(struct party_address &pa, string bitg, string gt, string 
 	memcpy(pa.gt, strgtt_to_buff(gt), 11);
 }
 
+/**
+ * Generate new su from strings.
+ * All fields give by strings.
+ */
 struct signal_unit new_su(string sbitg, string sgt, string spc, string sssn, string dgt, string dpc, string dssn) {
 	signal_unit su;
 	set_party_address(su.CgPA, sbitg, sgt, spc, sssn);
+	// default bitg = 1
 	set_party_address(su.CdPA, "1", dgt, dpc, dssn);
-
+	// give it dummy data
 	char data_dump[20] = "this is dummy data!";
-
+	// copy to su.data
 	memcpy(su.data, data_dump, MESSAGE_SIZE);
+	// return struct
 	return su;
 }
