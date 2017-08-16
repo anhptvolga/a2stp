@@ -1,4 +1,5 @@
 OBJS = server.o validator.o screener.o router.o bitlib.o
+TEST_OBJS = tests/validator_test.o bitlib.o validator.o
 CC = g++
 INCL = -I../include
 THREAD = -pthread
@@ -17,6 +18,11 @@ router.o : router.h router.cpp
 	$(CC) $(CFLAGS) $(INCL) router.cpp
 server.o : server.h server.cpp
 	$(CC) $(CFLAGS) $(INCL) server.cpp
+
+test : $(TEST_OBJS)
+	$(CC) $(LFLAGS) $(INCL) $(TEST_OBJS) -o server -lboost_unit_test_framework
+tests/validator_test.o : tests/validator_test.cpp
+	$(CC) $(CFLAGS) $(INCL) -o tests/validator_test.o tests/validator_test.cpp
 
 clean:
 	\rm *.o server
