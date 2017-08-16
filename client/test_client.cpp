@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(test_testbit_02) {
 
 /**
  * void arr_onbit(byte *a, int i, int size_a);
- * Test case 0: turn on single bit
+ * Test case 2: turn on single bit
  */
 BOOST_AUTO_TEST_CASE(test_arr_onbit_01) {
     byte org[2] = {0, 0};
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(test_arr_onbit_01) {
 
 /**
  * void arr_onbit(byte *a, int i, int size_a);
- * Test case 1: multi bit on in first byte
+ * Test case 3: multi bit on in first byte
  */
  BOOST_AUTO_TEST_CASE(test_arr_onbit_02) {
     byte org[2] = {0, 0};
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(test_arr_onbit_01) {
 
 /**
  * void arr_onbit(byte *a, int i, int size_a);
- * Test case 0: turn on multi bit in other byte
+ * Test case 3: turn on multi bit in other byte
  */
  BOOST_AUTO_TEST_CASE(test_arr_onbit_03) {
     byte org[2] = {0, 0};
@@ -155,5 +155,32 @@ BOOST_AUTO_TEST_CASE(test_arr_onbit_01) {
     BOOST_CHECK_EQUAL(org[1], 1);
 }
 
+/**
+ * void arr_onbit(byte *a, int i, int size_a);
+ * Test case 4: all bit = 1
+ */
+ BOOST_AUTO_TEST_CASE(test_arr_onbit_04) {
+    byte org[2] = {255, 255};
+    arr_onbit(org, 0);
+    arr_onbit(org, 8);
+    BOOST_CHECK_EQUAL(org[0], 255);
+    BOOST_CHECK_EQUAL(org[1], 255);
+}
+
 //--------------------------------------------------------------
 
+/**
+ * byte * short2buff(unsigned short x);
+ * Test case 1
+ */
+ BOOST_AUTO_TEST_CASE(test_short2buff_01) {
+    unsigned short x = 26;
+    byte *b = short2buff(x);
+    BOOST_CHECK_EQUAL((arr_testbit(b, 0)), 0);
+    BOOST_CHECK_EQUAL((arr_testbit(b, 1)), 1);
+    BOOST_CHECK_EQUAL((arr_testbit(b, 2)), 0);
+    BOOST_CHECK_EQUAL((arr_testbit(b, 3)), 1);
+    BOOST_CHECK_EQUAL((arr_testbit(b, 4)), 1);
+    for (int i = 5; i < 16; ++i)
+        BOOST_CHECK_EQUAL((arr_testbit(b, i)), 0);
+}
