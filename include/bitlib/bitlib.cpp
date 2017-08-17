@@ -4,7 +4,7 @@
  * Print all bit of byte c
  */
 void bin_print_char(byte c) {
-	for (int i = 0; i < CHAR_SIZE; i++) {
+	for (int i = 0; i < BYTE_SIZE; i++) {
 		if (testbit(c, i))
 			cout << "1";
 		else
@@ -61,14 +61,14 @@ bool testbit(byte num, int i) {
  * check i-th bit of buffer buff has buff_size bytes
  */
 bool arr_testbit(const byte *buff, int i) {
-	return testbit(buff[i / CHAR_SIZE], i % CHAR_SIZE);
+	return testbit(buff[i / BYTE_SIZE], i % BYTE_SIZE);
 }
 
 /*
  * Turn on pos-th bit of buffer (buff), know size of buffer. 
  */
 void arr_onbit(byte *buff, int pos) {
-	onbit(buff[pos / CHAR_SIZE], pos % CHAR_SIZE);
+	onbit(buff[pos / BYTE_SIZE], pos % BYTE_SIZE);
 }
 
 /**
@@ -81,7 +81,7 @@ void print_su(struct signal_unit s) {
 	cout << endl << "DPC: " << dec << buff2short(s.CgPA.pointCode);
 	cout << endl << "DSSN: " << (int)s.CgPA.subNumber;
 	ostringstream convert;
-	for (int i = 0; i < 11; i++) {
+	for (int i = 0; i < GT_SIZE; i++) {
 		convert << (int)s.CgPA.gt[i];	
 	}
 	cout << endl << "DGT: " << convert.str() << endl;
@@ -94,9 +94,9 @@ void print_su(struct signal_unit s) {
  * return bytes from unsigned short
  */
 byte *short2buff(unsigned short x) {
-	byte *b = new byte[2];
-	memset(b, 0, 2);
-	for (int i = 0; i < 16; ++i) {
+	byte *b = new byte[PC_SIZE];
+	memset(b, 0, PC_SIZE);
+	for (int i = 0; i < PC_SIZE * BYTE_SIZE; ++i) {
 		if ((x & 1 << i) != 0) {
 			arr_onbit(b, i);
 		} 
@@ -110,7 +110,7 @@ byte *short2buff(unsigned short x) {
  */
 unsigned short buff2short(byte *b) {
 	unsigned short x = 0;
-	for (int i = 0; i < 16; ++i) {
+	for (int i = 0; i < PC_SIZE * BYTE_SIZE; ++i) {
 		if (arr_testbit(b, i))
 			x += (1 << i);
 	}
@@ -123,10 +123,10 @@ unsigned short buff2short(byte *b) {
  byte *pa_to_buffer(struct party_address p) {
 	byte *ret = new byte[PA_SIZE];
 	memset(ret, 0, PA_SIZE);	
-	memcpy(ret, &p.indicator, 1);
-	memcpy(ret + 1, p.pointCode, 2);
-	memcpy(ret + 3, &p.subNumber, 1);
-	memcpy(ret + 4, p.gt, 11);
+	memcpy(ret, &p.indicator, INDICATOR_SIZE);
+	memcpy(ret + INDICATOR_SIZE, p.pointCode, PC_SIZE);
+	memcpy(ret + INDICATOR_SIZE + PC_SIZE, &p.subNumber, SSN_SIZE);
+	memcpy(ret + INDICATOR_SIZE + PC_SIZE + SSN_SIZE, p.gt, GT_SIZE);
 	return ret;
 }
 
@@ -141,8 +141,8 @@ byte *su_to_buffer(struct signal_unit s) {
 	const byte *cdpa_buf = pa_to_buffer(s.CdPA);
 	// concat all to one 50 bytes buffer
 	memcpy(pk, cgpa_buf, PA_SIZE);
-	memcpy(pk + 15, cdpa_buf, PA_SIZE);	
-	memcpy(pk + 30, s.data, MESSAGE_SIZE);
+	memcpy(pk + PA_SIZE, cdpa_buf, PA_SIZE);	
+	memcpy(pk + PA_SIZE + PA_SIZE, s.data, MESSAGE_SIZE);
 	return pk;
 }
 
@@ -163,7 +163,7 @@ byte *su_to_buffer(struct signal_unit s) {
  * Convert array of bytes to string (apply to global title).
  */
 string buffgt_to_str(byte *gtt) {
-    string res(11, 0);
+    string res(GT_SIZE, 0);
     int i;
     for (i = 0; i < GT_SIZE; ++i) {
         res[i] = gtt[i];
@@ -177,13 +177,13 @@ string buffgt_to_str(byte *gtt) {
 void set_party_address(struct party_address &pa, string bitg, string gt, string pc, string ssn) {
 	pa.indicator = 11;
 	if (bitg == "1") {
-		onbit(pa.indicator, 6);
+		onbit(pa.indicator, BIT_G_POS);
 	}
-	int x = atoi(pc.c_str());
-	memcpy(pa.pointCode, short2buff(x), 2);
-	int y = atoi(ssn.c_str());
+	int x = stoi(pc);
+	memcpy(pa.pointCode, short2buff(x), PC_SIZE);
+	int y = stoi(ssn);
 	pa.subNumber = y;
-	memcpy(pa.gt, strgtt_to_buff(gt), 11);
+	memcpy(pa.gt, strgtt_to_buff(gt), GT_SIZE);
 }
 
 /**
@@ -196,7 +196,7 @@ struct signal_unit new_su(string sbitg, string sgt, string spc, string sssn, str
 	// default bitg = 1
 	set_party_address(su.CdPA, "1", dgt, dpc, dssn);
 	// give it dummy data
-	char data_dump[20] = "this is dummy data!";
+	char data_dump[MESSAGE_SIZE] = "this is dummy data!";
 	// copy to su.data
 	memcpy(su.data, data_dump, MESSAGE_SIZE);
 	// return struct

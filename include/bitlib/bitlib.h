@@ -1,8 +1,6 @@
 #ifndef __bitlib_h__
 #define __bitlib_h__
 
-#define CHAR_SIZE 8
-
 #include <cstdio>
 #include <fstream>
 #include <cstdlib>

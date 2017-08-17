@@ -5,6 +5,7 @@
 #include <utility>
 #include <unordered_map>
 
+#define INDICATOR_SIZE 1
 #define SU_SIZE 50
 #define PA_SIZE 15
 #define GT_SIZE 11
@@ -20,9 +21,9 @@ typedef unsigned char byte;
 // total size of pa = 15 bytes
 struct party_address {
 	byte indicator;					// 1 byte
-	byte pointCode[2]; 				// 2 bytes
+	byte pointCode[PC_SIZE]; 		// 2 bytes
 	byte subNumber;					// 1 byte
-	byte gt[11];					// 11 byte
+	byte gt[GT_SIZE];				// 11 byte
 };
 
 // signal unit - a package of data from client to server
@@ -30,8 +31,7 @@ struct party_address {
 struct signal_unit {
 	struct party_address CgPA;
 	struct party_address CdPA;
-
-	byte data[20];
+	byte data[MESSAGE_SIZE];
 };
 
 typedef std::pair<int, int> pcssn;
