@@ -33,8 +33,8 @@ void read_ssn_list(string filename, set<string> &ssn_list) {
     if (f.is_open()) {
         while (!f.eof()) {
             f >> line;
-            x = atoi(line.c_str());
-            if (x < (1 << SSN_SIZE)) {
+            x = stoi(line);
+            if (x < UCHAR_MAX) {
                 ssn_list.insert(line);
             }
         }
@@ -54,7 +54,7 @@ void read_pc_list(string filename, set<string> &pc_list) {
     if (f.is_open()) {
         while (!f.eof()) {
             f >> line;
-            x = atoi(line.c_str());
+            x = stoi(line);
             if (x < USHRT_MAX) {
                 pc_list.insert(line);
             }
@@ -72,8 +72,8 @@ byte *random_data() {
 	memset(d, 0, MESSAGE_SIZE);
 	d[MESSAGE_SIZE - 1] = 0;
 	for (int i = 0; i < MESSAGE_SIZE - 1; i++) {
-		d[i] = rand() % ('a' - 'z') + 'a';
-	}
+		d[i] = rand() % ('z' - '0') + '0';
+    }
 	return d;
 }
 
@@ -94,7 +94,7 @@ void random_party_address(struct party_address &pa, set<string> gtt_set, set<str
 	it = pc_set.begin();
 	advance(it, rand() % pc_set.size());
 	int pc = atoi((*it).c_str());
-	memcpy(pa.pointCode, short2buff(pc), 2);
+	memcpy(pa.pointCode, short2buff(pc), PC_SIZE);
 
 	// random subnumber
 	it = ssn_set.begin();
@@ -105,7 +105,7 @@ void random_party_address(struct party_address &pa, set<string> gtt_set, set<str
 	// random global title
 	it = gtt_set.begin();
 	advance(it, rand() % gtt_set.size());
-	memcpy(pa.gt, strgtt_to_buff(*it), 11);
+	memcpy(pa.gt, strgtt_to_buff(*it), GT_SIZE);
 }
 
 /**
@@ -119,6 +119,9 @@ struct signal_unit generate_su(set<string> gt_set, set<string> pc_set, set<strin
 	return su;
 }
 
+/**
+ * Create and connect socket. return fd of socket.
+ */
 int connect_sock() {
     // Define a socket
     int sock;
@@ -147,6 +150,9 @@ int connect_sock() {
     return sock;
 }
 
+/**
+ * Loop send signal forever. Data random.
+ */
 void loop_send() {
     // prepare for random 
     srand(time(NULL));
@@ -192,6 +198,9 @@ void loop_send() {
     close(sock); // unreachable code!!??
 }
 
+/**
+ * Send signal by reading from file.
+ */
 void send_signal_in_file(const char *filename) {
     int sockfd = connect_sock();
 
@@ -228,13 +237,11 @@ void send_signal_in_file(const char *filename) {
             } 
         }
     } else 
-        cout << "unable to open file " << filename << endl;
+        cout << "Unable to open file." << filename << endl;
     ifs.close();
 }
 
-
 #ifndef UNIT_TEST // to compile without main function
-
 /**
  * For every 100ms, pack and send a signal to server.
  */
@@ -246,9 +253,8 @@ int main(int argc, char const *argv[]) {
         case 2:
             send_signal_in_file(argv[1]);
             break;
-
         default:
-            cout << "argc not match" << endl;
+            cout << "Argument does not match!" << endl;
             break;
     }
 

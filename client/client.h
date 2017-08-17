@@ -52,18 +52,18 @@ void random_party_address(struct party_address &pa, set<string> gtt_set, set<str
 byte *random_data();
 
 /**
- * Continuosly sent data
+ * Continuosly sent data.
  */
 void loop_send();
 
 /**
- * Continuosly sent data
+ * Create and connect socket. return fd of socket.
  */
- int connect_sock();
+int connect_sock();
  
 
 /**
- * Sent data in file 
+ * Sent data in file.
  */
 void send_signal_in_file(const char *filename);
 
