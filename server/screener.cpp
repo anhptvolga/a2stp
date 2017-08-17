@@ -16,15 +16,18 @@ void read_block_list(const char *filename, mapstrbool &blist) {
 	string bspc, bdpc, h;
 	string line;
 	ifstream f(filename);
-	
+        
+        // checking file open
 	if (f.is_open()) {
 		while (getline(f, line)) {
+                        // delete comment
 			size_t pos = line.find_first_of("#");
 			size_t l = line.length();
 			if (pos != string::npos) {
 				line = line.erase(pos, l - pos);
 			}
 
+                        // process
 			istringstream iss(line);
 			if (!(iss >> bspc >> bdpc)) { continue; }
 			h = bspc + bdpc;
@@ -60,7 +63,7 @@ bool check_block(struct signal_unit su, time_t t, mapstrbool blist) {
 	
 	// found the key in map -> block it -> return false
 	if (i1 != blist.end() || i2 != blist.end() || i3 != blist.end() || i4 != blist.end()) {
-	//if (i1 != blist.end()) {
+                // write block log file
 		ofstream ofs(LFILE_BLOCK, ofstream::out | ofstream::app);
 		if (ofs.is_open()) {
 			string stime(ctime(&t));
@@ -79,15 +82,3 @@ bool check_block(struct signal_unit su, time_t t, mapstrbool blist) {
     return true;
 }
 
-// main function for testing
-// int main() {
-// 	signal_unit s1 = new_su("0", "11111111111", "1003", "3", "11111111113", "1004", "2");
-// 	signal_unit s2 = new_su("0", "11111111111", "2001", "3", "11111111113", "9999", "2");
-// 	signal_unit s3 = new_su("0", "11111111111", "1993", "3", "11111111113", "1004", "2");
-// 	signal_unit s4 = new_su("0", "11111111111", "2017", "3", "11111111113", "1004", "2");
-// 	mapstrbool hmap;
-// 	read_block_list(CFILE_SCREENING, hmap);
-// 	check_block(s1, time(0), hmap);
-// 	//print_su(s1);
-// 	return 0;
-// }
